@@ -124,7 +124,7 @@ def remote_realm_billing_entry(
     signed_identity_dict = signing.dumps(identity_dict)
 
     billing_access_url = (
-        f"{settings.EXTERNAL_URI_SCHEME}{settings.SELF_HOSTING_MANAGEMENT_SUBDOMAIN}.{settings.EXTERNAL_HOST}"
+        f"{settings.EXTERNAL_URL_SCHEME}{settings.SELF_HOSTING_MANAGEMENT_SUBDOMAIN}.{settings.EXTERNAL_HOST}"
         + reverse(remote_realm_billing_finalize_login, args=[signed_identity_dict])
     )
     return json_success(request, data={"billing_access_url": billing_access_url})

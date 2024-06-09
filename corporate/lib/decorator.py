@@ -104,7 +104,7 @@ def authenticated_remote_realm_management_endpoint(
                 # was deleted.
                 raise AssertionError
 
-            # Using EXTERNAL_URI_SCHEME means we'll do https:// in production, which is
+            # Using EXTERNAL_URL_SCHEME means we'll do https:// in production, which is
             # the sane default - while having http:// in development, which will allow
             # these redirects to work there for testing.
             url = urljoin(uri_scheme + remote_realm.host, "/self-hosted-billing/")

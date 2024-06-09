@@ -71,7 +71,7 @@ def is_static_or_current_realm_url(url: str, realm: Optional[Realm]) -> bool:
     if (
         realm is not None
         and split_url.netloc == realm.host
-        and f"{split_url.scheme}://" == settings.EXTERNAL_URI_SCHEME
+        and f"{split_url.scheme}://" == settings.EXTERNAL_URL_SCHEME
     ):
         return True
 

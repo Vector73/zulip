@@ -141,7 +141,7 @@ def realm_support_link(realm_str: str) -> Markup:
 
 def realm_url_link(realm_str: str) -> Markup:
     host = Realm.host_for_subdomain(realm_str)
-    url = settings.EXTERNAL_URI_SCHEME + mark_sanitized(host)
+    url = settings.EXTERNAL_URL_SCHEME + mark_sanitized(host)
     return Markup('<a href="{url}"><i class="fa fa-home"></i></a>').format(url=url)
 
 

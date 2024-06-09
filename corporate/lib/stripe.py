@@ -4132,7 +4132,7 @@ class RemoteRealmBillingSession(BillingSession):
     @override
     @property
     def billing_session_url(self) -> str:  # nocoverage
-        return f"{settings.EXTERNAL_URI_SCHEME}{settings.SELF_HOSTING_MANAGEMENT_SUBDOMAIN}.{settings.EXTERNAL_HOST}/realm/{self.remote_realm.uuid}"
+        return f"{settings.EXTERNAL_URL_SCHEME}{settings.SELF_HOSTING_MANAGEMENT_SUBDOMAIN}.{settings.EXTERNAL_HOST}/realm/{self.remote_realm.uuid}"
 
     @override
     @property
@@ -4577,7 +4577,7 @@ class RemoteServerBillingSession(BillingSession):
     @override
     @property
     def billing_session_url(self) -> str:  # nocoverage
-        return f"{settings.EXTERNAL_URI_SCHEME}{settings.SELF_HOSTING_MANAGEMENT_SUBDOMAIN}.{settings.EXTERNAL_HOST}/server/{self.remote_server.uuid}"
+        return f"{settings.EXTERNAL_URL_SCHEME}{settings.SELF_HOSTING_MANAGEMENT_SUBDOMAIN}.{settings.EXTERNAL_HOST}/server/{self.remote_server.uuid}"
 
     @override
     @property

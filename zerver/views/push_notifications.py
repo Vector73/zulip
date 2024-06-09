@@ -142,7 +142,7 @@ def self_hosting_auth_view_common(
         # to redirect the user to for re-authing in case the session expires.
         # Otherwise, the bouncer would know only the realm.host but be missing
         # the knowledge of whether to use http or https.
-        "uri_scheme": settings.EXTERNAL_URI_SCHEME,
+        "uri_scheme": settings.EXTERNAL_URL_SCHEME,
     }
     if next_page is not None:
         post_data["next_page"] = next_page

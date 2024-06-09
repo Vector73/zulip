@@ -954,7 +954,7 @@ class Realm(models.Model):  # type: ignore[django-manager-missing] # django-stub
 
     @property
     def url(self) -> str:
-        return settings.EXTERNAL_URI_SCHEME + self.host
+        return settings.EXTERNAL_URL_SCHEME + self.host
 
     @property
     def host(self) -> str:

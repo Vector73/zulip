@@ -61,7 +61,7 @@ class Command(ZulipBaseCommand):
         if settings.PUSH_NOTIFICATION_BOUNCER_URL is None:
             if settings.DEVELOPMENT:
                 settings.PUSH_NOTIFICATION_BOUNCER_URL = (
-                    settings.EXTERNAL_URI_SCHEME + settings.EXTERNAL_HOST
+                    settings.EXTERNAL_URL_SCHEME + settings.EXTERNAL_HOST
                 )
             else:
                 raise CommandError(

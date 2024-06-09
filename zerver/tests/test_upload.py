@@ -1084,7 +1084,7 @@ class AvatarTest(UploadSerializeMixin, ZulipTestCase):
         cordelia.email = cordelia.delivery_email
         cordelia.save()
         with self.settings(
-            ENABLE_GRAVATAR=False, DEFAULT_AVATAR_URI="http://other.server/avatar.svg"
+            ENABLE_GRAVATAR=False, DEFAULT_AVATAR_URL="http://other.server/avatar.svg"
         ):
             response = self.client_get("/avatar/cordelia@zulip.com", {"foo": "bar"})
             redirect_url = response["Location"]
@@ -1502,7 +1502,7 @@ class RealmIconTest(UploadSerializeMixin, ZulipTestCase):
     def test_get_settings_realm_icon(self) -> None:
         self.login("hamlet")
         with self.settings(
-            ENABLE_GRAVATAR=False, DEFAULT_AVATAR_URI="http://other.server/icon.svg"
+            ENABLE_GRAVATAR=False, DEFAULT_AVATAR_URL="http://other.server/icon.svg"
         ):
             response = self.client_get("/json/realm/icon", {"foo": "bar"})
             redirect_url = response["Location"]
@@ -1654,7 +1654,7 @@ class RealmLogoTest(UploadSerializeMixin, ZulipTestCase):
 
     def test_get_settings_logo(self) -> None:
         self.login("hamlet")
-        with self.settings(DEFAULT_LOGO_URI="http://other.server/logo.svg"):
+        with self.settings(DEFAULT_LOGO_URL="http://other.server/logo.svg"):
             response = self.client_get(
                 "/json/realm/logo", {"night": orjson.dumps(self.night).decode()}
             )

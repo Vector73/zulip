@@ -45,7 +45,7 @@ EMAIL_HOST: Optional[str] = None
 # we leave up to Django's defaults.
 
 # LDAP auth
-AUTH_LDAP_SERVER_URI = ""
+AUTH_LDAP_SERVER_URL = ""
 AUTH_LDAP_BIND_DN = ""
 AUTH_LDAP_USER_SEARCH: Optional["LDAPSearch"] = None
 LDAP_APPEND_DOMAIN: Optional[str] = None
@@ -145,8 +145,8 @@ SENTRY_FRONTEND_TRACE_RATE: float = 0.1
 
 # File uploads and avatars
 # TODO: Rename MAX_FILE_UPLOAD_SIZE to have unit in name.
-DEFAULT_AVATAR_URI: Optional[str] = None
-DEFAULT_LOGO_URI: Optional[str] = None
+DEFAULT_AVATAR_URL: Optional[str] = None
+DEFAULT_LOGO_URL: Optional[str] = None
 S3_AVATAR_BUCKET = ""
 S3_AUTH_UPLOADS_BUCKET = ""
 S3_REGION: Optional[str] = None
@@ -186,7 +186,7 @@ USER_STATE_SIZE_LIMIT = 10000000
 BOT_CONFIG_SIZE_LIMIT = 10000
 
 # External service configuration
-CAMO_URI = ""
+CAMO_URL = ""
 MEMCACHED_LOCATION = "127.0.0.1:11211"
 MEMCACHED_USERNAME = None if get_secret("memcached_password") is None else "zulip@localhost"
 RABBITMQ_HOST = "127.0.0.1"
@@ -364,7 +364,7 @@ EXTRA_INSTALLED_APPS = ["analytics"]
 
 # Used to construct URLs to point to the Zulip server.  Since we
 # only support HTTPS in production, this is just for development.
-EXTERNAL_URI_SCHEME = "https://"
+EXTERNAL_URL_SCHEME = "https://"
 
 # Whether anyone can create a new organization on the Zulip server.
 OPEN_REALM_CREATION = False
@@ -389,7 +389,7 @@ REALM_HOSTS: Dict[str, str] = {}
 # authentication.  This, combined with adding the relevant hosts to
 # ALLOWED_HOSTS, can be used for environments where security policies
 # mean that a different hostname must be used for mobile access.
-REALM_MOBILE_REMAP_URIS: Dict[str, str] = {}
+REALM_MOBILE_REMAP_URLS: Dict[str, str] = {}
 
 # Whether the server is using the PGroonga full-text search
 # backend.  Plan is to turn this on for everyone after further

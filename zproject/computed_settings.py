@@ -24,9 +24,9 @@ from .configured_settings import (
     ALLOWED_HOSTS,
     AUTH_LDAP_BIND_DN,
     AUTH_LDAP_CONNECTION_OPTIONS,
-    AUTH_LDAP_SERVER_URI,
+    AUTH_LDAP_SERVER_URL,
     AUTHENTICATION_BACKENDS,
-    CAMO_URI,
+    CAMO_URL,
     CUSTOM_HOME_NOT_LOGGED_IN,
     DEBUG,
     DEBUG_ERROR_REPORTING,
@@ -36,7 +36,7 @@ from .configured_settings import (
     ERROR_REPORTING,
     EXTERNAL_HOST,
     EXTERNAL_HOST_WITHOUT_PORT,
-    EXTERNAL_URI_SCHEME,
+    EXTERNAL_URL_SCHEME,
     EXTRA_INSTALLED_APPS,
     GOOGLE_OAUTH2_CLIENT_ID,
     IS_DEV_DROPLET,
@@ -437,7 +437,7 @@ else:
 # API/BOT SETTINGS
 ########################################################################
 
-ROOT_DOMAIN_URI = EXTERNAL_URI_SCHEME + EXTERNAL_HOST
+ROOT_DOMAIN_URL = EXTERNAL_URL_SCHEME + EXTERNAL_HOST
 
 S3_KEY = get_secret("s3_key")
 S3_SECRET_KEY = get_secret("s3_secret_key")
@@ -521,7 +521,7 @@ INTERNAL_BOT_DOMAIN = "zulip.com"
 ########################################################################
 
 # This needs to be synced with the Camo installation
-CAMO_KEY = get_secret("camo_key") if CAMO_URI != "" else None
+CAMO_KEY = get_secret("camo_key") if CAMO_URL != "" else None
 
 ########################################################################
 # KATEX SERVER SETTINGS
@@ -537,7 +537,7 @@ KATEX_SERVER_PORT = get_config("application_server", "katex_server_port", "9700"
 
 if STATIC_URL is None:
     if PRODUCTION or IS_DEV_DROPLET or os.getenv("EXTERNAL_HOST") is not None:
-        STATIC_URL = urljoin(ROOT_DOMAIN_URI, "/static/")
+        STATIC_URL = urljoin(ROOT_DOMAIN_URL, "/static/")
     else:
         STATIC_URL = "http://localhost:9991/static/"
 
@@ -1006,7 +1006,7 @@ else:
 
 AUTHENTICATION_BACKENDS += ("zproject.backends.ZulipDummyBackend",)
 
-POPULATE_PROFILE_VIA_LDAP = bool(AUTH_LDAP_SERVER_URI)
+POPULATE_PROFILE_VIA_LDAP = bool(AUTH_LDAP_SERVER_URL)
 
 if POPULATE_PROFILE_VIA_LDAP and not USING_LDAP:
     AUTHENTICATION_BACKENDS += ("zproject.backends.ZulipLDAPUserPopulator",)
@@ -1192,7 +1192,7 @@ SCIM_SERVICE_PROVIDER = {
     # but django-scim2 requires it to be set, even though it ends up not being used.
     # So we need to give it some value here, and EXTERNAL_HOST is the most generic.
     "NETLOC": EXTERNAL_HOST,
-    "SCHEME": EXTERNAL_URI_SCHEME,
+    "SCHEME": EXTERNAL_URL_SCHEME,
     "GET_EXTRA_MODEL_FILTER_KWARGS_GETTER": "zerver.lib.scim.get_extra_model_filter_kwargs_getter",
     "BASE_LOCATION_GETTER": "zerver.lib.scim.base_scim_location_getter",
     "AUTH_CHECK_MIDDLEWARE": "zerver.middleware.ZulipSCIMAuthCheckMiddleware",

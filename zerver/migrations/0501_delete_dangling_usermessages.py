@@ -167,7 +167,7 @@ def log_extra_usermessage_rows(apps: StateApps, schema_editor: BaseDatabaseSchem
 
             stream = Stream.objects.only("id").get(recipient_id=message.recipient_id)
             print(
-                f"{settings.EXTERNAL_URI_SCHEME}{hostname}/#narrow/stream/{stream.id}/near/{message.id}",
+                f"{settings.EXTERNAL_URL_SCHEME}{hostname}/#narrow/stream/{stream.id}/near/{message.id}",
             )
             print(
                 f"    Moved at {message.timestamp_moved} from stream id {message.moved_from_stream_id} to {message.moved_to_stream_id}"

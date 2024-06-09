@@ -1167,7 +1167,7 @@ def find_account(request: HttpRequest) -> HttpResponse:
 
             # Links in find_team emails use the server's information
             # and not any particular realm's information.
-            external_host_base_url = f"{settings.EXTERNAL_URI_SCHEME}{settings.EXTERNAL_HOST}"
+            external_host_base_url = f"{settings.EXTERNAL_URL_SCHEME}{settings.EXTERNAL_HOST}"
             help_base_url = f"{external_host_base_url}/help"
             help_reset_password_link = (
                 f"{help_base_url}/change-your-password#if-youve-forgotten-or-never-had-a-password"

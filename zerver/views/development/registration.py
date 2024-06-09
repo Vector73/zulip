@@ -42,7 +42,7 @@ def register_development_user(request: HttpRequest) -> HttpResponse:
     realm = get_realm_from_request(request)
     if realm is None:  # nocoverage
         return HttpResponseRedirect(
-            f"{settings.EXTERNAL_URI_SCHEME}{settings.REALM_HOSTS['zulip']}/devtools/register_user/",
+            f"{settings.EXTERNAL_URL_SCHEME}{settings.REALM_HOSTS['zulip']}/devtools/register_user/",
             status=307,
         )
 

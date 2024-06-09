@@ -64,13 +64,13 @@ AUTHENTICATION_BACKENDS: Tuple[str, ...] = (
     "zproject.backends.GenericOpenIdConnectBackend",
 )
 
-EXTERNAL_URI_SCHEME = "http://"
+EXTERNAL_URL_SCHEME = "http://"
 
 if os.getenv("BEHIND_HTTPS_PROXY"):
     # URLs served by the development environment will be HTTPS
-    EXTERNAL_URI_SCHEME = "https://"
+    EXTERNAL_URL_SCHEME = "https://"
     # Trust requests from this host (required due to Nginx proxy)
-    CSRF_TRUSTED_ORIGINS = [EXTERNAL_URI_SCHEME + EXTERNAL_HOST]
+    CSRF_TRUSTED_ORIGINS = [EXTERNAL_URL_SCHEME + EXTERNAL_HOST]
 
 EMAIL_GATEWAY_PATTERN = "%s@" + EXTERNAL_HOST_WITHOUT_PORT
 NOTIFICATION_BOT = "notification-bot@zulip.com"
@@ -79,7 +79,7 @@ PHYSICAL_ADDRESS = "Zulip Headquarters, 123 Octo Stream, South Pacific Ocean"
 STAFF_SUBDOMAIN = "zulip"
 EXTRA_INSTALLED_APPS = ["zilencer", "analytics", "corporate"]
 # Disable Camo in development
-CAMO_URI = ""
+CAMO_URL = ""
 
 TORNADO_PORTS = [9993]
 

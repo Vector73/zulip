@@ -201,7 +201,7 @@ def confirmation_url(
     url_args = dict(url_args)
     url_args["confirmation_key"] = confirmation_key
     return urljoin(
-        settings.ROOT_DOMAIN_URI if realm is None else realm.url,
+        settings.ROOT_DOMAIN_URL if realm is None else realm.url,
         reverse(_properties[confirmation_type].url_name, kwargs=url_args),
     )
 
@@ -310,7 +310,7 @@ def generate_realm_creation_url(by_admin: bool = False) -> str:
         creation_key=key, date_created=timezone_now(), presume_email_valid=by_admin
     )
     return urljoin(
-        settings.ROOT_DOMAIN_URI,
+        settings.ROOT_DOMAIN_URL,
         reverse("create_realm", kwargs={"creation_key": key}),
     )
 

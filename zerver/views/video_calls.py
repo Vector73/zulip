@@ -57,7 +57,7 @@ def get_zoom_session(user: UserProfile) -> OAuth2Session:
 
     return OAuth2Session(
         client_id,
-        redirect_uri=urljoin(settings.ROOT_DOMAIN_URI, "/calls/zoom/complete"),
+        redirect_uri=urljoin(settings.ROOT_DOMAIN_URL, "/calls/zoom/complete"),
         auto_refresh_url="https://zoom.us/oauth/token",
         auto_refresh_kwargs={
             "client_id": client_id,

@@ -54,10 +54,10 @@ def add_api_url_context(context: Dict[str, Any], request: HttpRequest) -> None:
 
     display_host = Realm.host_for_subdomain(display_subdomain)
     api_url_scheme_relative = display_host + "/api"
-    api_url = settings.EXTERNAL_URI_SCHEME + api_url_scheme_relative
-    zulip_url = settings.EXTERNAL_URI_SCHEME + display_host
+    api_url = settings.EXTERNAL_URL_SCHEME + api_url_scheme_relative
+    zulip_url = settings.EXTERNAL_URL_SCHEME + display_host
 
-    context["external_url_scheme"] = settings.EXTERNAL_URI_SCHEME
+    context["external_url_scheme"] = settings.EXTERNAL_URL_SCHEME
     context["api_url"] = api_url
     context["api_url_scheme_relative"] = api_url_scheme_relative
     context["zulip_url"] = zulip_url
