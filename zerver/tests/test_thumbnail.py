@@ -16,8 +16,8 @@ class ThumbnailTest(ZulipTestCase):
         result = self.client_post("/json/user_uploads", {"file": fp})
         self.assert_json_success(result)
         json = orjson.loads(result.content)
-        self.assertIn("uri", json)
-        url = json["uri"]
+        self.assertIn("url", json)
+        url = json["url"]
         base = "/user_uploads/"
         self.assertEqual(base, url[: len(base)])
 
@@ -57,7 +57,7 @@ class ThumbnailTest(ZulipTestCase):
         result = self.client_post("/json/user_uploads", {"file": fp})
         self.assert_json_success(result)
         json = orjson.loads(result.content)
-        url = json["uri"]
+        url = json["url"]
 
         with ratelimit_rule(86400, 1000, domain="spectator_attachment_access_by_file"):
             # Deny file access for non-web-public stream

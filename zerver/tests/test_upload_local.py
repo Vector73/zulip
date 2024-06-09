@@ -80,7 +80,7 @@ class LocalStorageTest(UploadSerializeMixin, ZulipTestCase):
         result = self.client_post("/json/user_uploads", {"file": fp})
 
         response_dict = self.assert_json_success(result)
-        path_id = re.sub(r"/user_uploads/", "", response_dict["uri"])
+        path_id = re.sub(r"/user_uploads/", "", response_dict["url"])
 
         assert settings.LOCAL_FILES_DIR is not None
         file_path = os.path.join(settings.LOCAL_FILES_DIR, path_id)
