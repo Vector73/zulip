@@ -3,6 +3,7 @@ import _ from "lodash";
 import * as blueslip from "./blueslip";
 import {$t} from "./i18n";
 import type {MatchedMessage, Message, RawMessage} from "./message_store";
+import {current_user} from "./state_data";
 import type {UpdateMessageEvent} from "./types";
 import {user_settings} from "./user_settings";
 
@@ -69,6 +70,14 @@ export const same_stream_and_topic = function util_same_stream_and_topic(
 
 export function extract_pm_recipients(recipients: string): string[] {
     return recipients.split(/\s*[,;]\s*/).filter((recipient) => recipient.trim() !== "");
+}
+
+// Removes current user from `user_ids_string`.
+export function extract_pm_recipient_ids_string(user_ids_string: string): string {
+    return user_ids_string
+        .split(/\s*[,;]\s*/)
+        .filter((user_id) => user_id !== current_user.user_id.toString())
+        .join(",");
 }
 
 // When the type is "private", properties from to_user_ids might be undefined.

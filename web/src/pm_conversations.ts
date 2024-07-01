@@ -1,8 +1,13 @@
+import assert from "minimalistic-assert";
+
+import {all_messages_data} from "./all_messages_data";
 import {FoldDict} from "./fold_dict";
+import * as message_lists from "./message_lists";
 import type {Message} from "./message_store";
 import * as muted_users from "./muted_users";
 import * as people from "./people";
 import type {StateData} from "./state_data";
+import * as util from "./util";
 
 type PMConversation = {
     user_ids_string: string;
@@ -88,6 +93,48 @@ class RecentDirectMessages {
         return this.recent_private_messages
             .filter((pm) => filter_muted_pms(pm))
             .map((conversation) => conversation.user_ids_string);
+    }
+
+    has_conversation(user_ids_string: string): boolean | undefined {
+        const recipient_ids_string = util.extract_pm_recipient_ids_string(user_ids_string);
+        // Check if there are any previous messages in the conversation.
+        const previous_direct_messages_exist = all_messages_data
+            .all_messages()
+            .find((message) => message.is_private && message.to_user_ids === recipient_ids_string);
+        // If there are, then return `true`.
+        if (previous_direct_messages_exist) {
+            return true;
+        }
+
+        // If not, then check if the current filter matches the DM view we
+        // are composing to.
+        const narrow_terms = message_lists.current?.data.filter.terms();
+        if (narrow_terms) {
+            const dm_conversation = narrow_terms.find(
+                (narrow_term) =>
+                    narrow_term.operator === "dm-including" || narrow_term.operator === "dm",
+            );
+            if (dm_conversation) {
+                const emails = util.extract_pm_recipients(dm_conversation.operand);
+                const user_ids = emails.map((email) => {
+                    const user = people.get_by_email(email);
+                    assert(user !== undefined);
+                    return user.user_id;
+                });
+                const current_user_ids_string = util.extract_pm_recipient_ids_string(
+                    util.sorted_ids(user_ids).toString(),
+                );
+                // If it matches the DM view, return `false` as there are no previous messages
+                // in the conversation.
+                if (recipient_ids_string === current_user_ids_string) {
+                    return false;
+                }
+            }
+        }
+        // If none of the above conditions are satisfied, there may or may not be
+        // any messages in the conversation since we have not narrowed to the view
+        // and there can be messages in the conversation which are not fetched yet.
+        return undefined;
     }
 
     initialize(params: StateData["pm_conversations"]): void {
