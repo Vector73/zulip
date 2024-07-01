@@ -838,6 +838,14 @@ strong {
             .typeahead-text-container {
                 align-self: center;
 
+                &.has_rendered_markdown {
+                    /* This makes the overall width of the typeahead to be 292px. */
+                    max-width: 270px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
                 & > * {
                     margin-right: 3px;
                 }
@@ -1357,7 +1365,6 @@ div.focused-message-list {
             display: block;
             float: right;
             margin-top: 5px;
-            margin-right: -12px;
             font-size: 0.8em;
             color: hsl(96deg 7% 73%);
         }
