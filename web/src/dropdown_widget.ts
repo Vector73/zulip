@@ -104,6 +104,12 @@ export class DropdownWidget {
     constructor(options: DropdownWidgetOptions) {
         this.widget_name = options.widget_name;
         this.widget_selector = `#${CSS.escape(this.widget_name)}_widget`;
+        if (this.widget_name === "saved_snippets") {
+            // Since multiple `saved_snippets_widget` buttons can exist, we want them
+            // to be referenced by the class name rather than id to avoid multiple
+            // elements with the same id.
+            this.widget_selector = `.${CSS.escape(this.widget_name)}_widget`;
+        }
         // A widget wrapper may not exist based on the UI requirement.
         this.widget_wrapper_id = `${this.widget_selector}_wrapper`;
         this.widget_value_selector = `${this.widget_selector} .dropdown_widget_value`;
