@@ -825,6 +825,29 @@ export function rewire_can_post_messages_in_stream(
     can_post_messages_in_stream = value;
 }
 
+export function user_can_move_messages_out_of_channel(stream: StreamSubscription): boolean {
+    if (page_params.is_spectator) {
+        return false;
+    }
+
+    if (stream.is_archived) {
+        return false;
+    }
+
+    if (can_administer_channel(stream)) {
+        return true;
+    }
+
+    return (
+        settings_data.user_can_move_messages_between_streams() ||
+        settings_data.user_has_permission_for_group_setting(
+            stream.can_move_messages_out_of_channel_group,
+            "can_move_messages_out_of_channel_group",
+            "stream",
+        )
+    );
+}
+
 export function user_can_move_messages_within_channel(stream: StreamSubscription): boolean {
     if (page_params.is_spectator) {
         return false;
