@@ -59,7 +59,7 @@ let edit_message_id: number | null = null;
 let current_message_id: number | null = null;
 
 const EMOJI_CATEGORIES = [
-    {name: "Popular", icon: "fa-star-o", translated: $t({defaultMessage: "Popular"})},
+    {name: "Suggested", icon: "fa-star-o", translated: $t({defaultMessage: "Suggested"})},
     {
         name: "Smileys & Emotion",
         icon: "fa-smile-o",
@@ -179,7 +179,7 @@ export function rebuild_catalog(): void {
             }
         }
     }
-    catalog.set("Popular", popular);
+    catalog.set("Suggested", popular);
 
     const categories = EMOJI_CATEGORIES.filter((category) => catalog.has(category.name));
     complete_emoji_catalog = categories.map((category) => ({
@@ -622,9 +622,9 @@ export function emoji_select_tab($elt: JQuery): void {
         // Handles the corner case where the refill_section_head_offsets()
         // is still running and section_head_offset[] is still empty,
         // scroll events in the middle may attempt to access section_head_offset[]
-        // causing exception. In this situation the currently_selected is hardcoded as "Popular".
+        // causing exception. In this situation the currently_selected is hardcoded as "Suggested".
         if (section_head_offsets.length === 0) {
-            currently_selected = "Popular";
+            currently_selected = "Suggested";
         } else {
             currently_selected = section_head_offsets[0]!.section;
         }
