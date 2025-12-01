@@ -310,6 +310,25 @@ function parse_with_options(
                 user_id.toString(),
             )}">${_.escape(display_text)}</span>`;
         },
+
+        replyHandler(mention: string, silently: boolean, href: string, text: string) {
+            const mention_markdown_string = this.userMentionHandler(mention, silently);
+
+            try {
+                var prot = decodeURIComponent(href)
+                    .replace(/[^\w:]/g, '')
+                    .toLowerCase();
+            } catch (e) {
+                return '';
+            }
+            if (prot.startsWith('javascript:') || prot.startsWith('vbscript:')) {
+                return '';
+            }
+            const link_markdown_string = '<a class="reply-link" href="' + href + '"' + '>' + text + '</a>';
+
+            return `<span class="reply"></i>${mention_markdown_string} ${link_markdown_string}</span>`
+        },
+
         groupMentionHandler(name: string, silently: boolean): string | undefined {
             const group = helper_config.get_user_group_from_name(name);
             if (group !== undefined) {

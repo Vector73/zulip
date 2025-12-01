@@ -42,6 +42,7 @@ import * as ui_util from "./ui_util.ts";
 import {parse_html} from "./ui_util.ts";
 import {user_settings} from "./user_settings.ts";
 import * as util from "./util.ts";
+import { extract_reply, toggle_silent_mention } from "./compose.ts";
 
 export function initialize(): void {
     // MESSAGE CLICKING
@@ -452,6 +453,30 @@ export function initialize(): void {
         e.stopPropagation();
         sidebar_ui.hide_userlist_sidebar();
     });
+
+    $("body").on("click", ".mention-button", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const $reply = $(this).closest(".reply-wrapper")
+        const $user_mention = $reply.children(".user-mention")
+        const is_silent = $user_mention.hasClass("silent")
+        $user_mention.toggleClass("silent")
+        let username = $user_mention.text();
+        console.log($user_mention, $reply)
+        if (!username.startsWith("@")) {
+            username = "@" + username;
+            const $mention_icon = $(this).find(".zulip-icon-at-sign");
+            $mention_icon.removeClass("zulip-icon-at-sign")
+            $mention_icon.addClass("zulip-icon-at-sign-crossed")
+        }
+        else {
+            username = username.slice(1)
+            const $mention_icon = $(this).find(".zulip-icon-at-sign-crossed");
+            $mention_icon.removeClass("zulip-icon-at-sign-crossed")
+            $mention_icon.addClass("zulip-icon-at-sign")
+        }
+        $user_mention.text(username)
+    })
 
     // Doesn't show tooltip on touch devices.
     function do_render_buddy_list_tooltip(

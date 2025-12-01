@@ -28,6 +28,7 @@ import * as transmit from "./transmit.ts";
 import {user_settings} from "./user_settings.ts";
 import * as util from "./util.ts";
 import * as zcommand from "./zcommand.ts";
+import { $t } from "./i18n.ts";
 
 // Docs: https://zulip.readthedocs.io/en/latest/subsystems/sending-messages.html
 
@@ -111,6 +112,31 @@ export function render_preview_area(): void {
     $preview_message_area.show();
 }
 
+const REPLY_RE = /^@(_?)(?:\*\*([^\*]+)\*\*)\s+>\s+!?\[(.+?)\]\((.+?)\)/
+
+export function toggle_silent_mention($textarea: JQuery<HTMLElement>) {
+    const message = $textarea.val()?.toString()
+    assert(message !== undefined)
+    const extracted = extract_reply(message);
+    if (extracted) {
+        if (extracted.reply.startsWith("@_**")) {
+            extracted.reply = extracted.reply.replace("@_**", "@**");
+        } else {
+            extracted.reply = extracted.reply.replace("@**", "@_**");
+        }
+        $textarea.val(extracted.reply + extracted.message)
+    }
+}
+
+export function extract_reply(message: string) {
+    const match = message.match(REPLY_RE);
+    if (match) {
+        const [reply, silent, username, text, href] = match;
+        return {reply, message: message.slice(reply.length)}
+    }
+    return undefined
+}
+
 export function clear_compose_box(): void {
     /* Before clearing the compose box, we reset it to the
      * default/normal size. Note that for locally echoed messages, we
@@ -176,6 +202,30 @@ export function send_message_success(
     }
 }
 
+export function get_message_with_reply() {
+    const content = compose_state.message_content()
+    const $reply = $("textarea#compose-textarea").closest("#message-content-container").find(".reply-wrapper")
+    if ($reply.length === 0) {
+        return content;
+    }
+    const $user_mention = $reply.children(".user-mention")
+    const user_id = $user_mention.attr("data-user-id")
+    const username = $user_mention.text()
+    let mention = `@_**${username}|${user_id}**`
+    if (username.startsWith("@")) {
+       mention = `@**${username.slice(1)}|${user_id}**`
+    }
+    let reply_content = $t(
+        {defaultMessage: "{username} > [{content}]({link_to_message})"},
+        {
+            username: mention,
+            link_to_message: $reply.children("a").attr("href"),
+            content: $reply.children("a").text(),
+        },
+    );
+    return reply_content + "\n" + content;
+}
+
 export let send_message = (): void => {
     // Changes here must also be kept in sync with echo.try_deliver_locally
     compose_state.set_recipient_edited_manually(false);
@@ -202,7 +252,7 @@ export let send_message = (): void => {
         const recipient_ids = compose_state.private_message_recipient_ids();
         message_data = {
             type: message_type,
-            content: compose_state.message_content(),
+            content: get_message_with_reply(),
             sender_id: current_user.user_id,
             queue_id: server_events_state.queue_id,
             topic: "",
@@ -219,7 +269,7 @@ export let send_message = (): void => {
         const topic = compose_state.topic();
         message_data = {
             type: message_type,
-            content: compose_state.message_content(),
+            content: get_message_with_reply(),
             sender_id: current_user.user_id,
             queue_id: server_events_state.queue_id,
             topic: util.is_topic_name_considered_empty(topic) ? "" : topic,
@@ -427,13 +477,13 @@ function schedule_message_to_custom_date(): void {
         type: req_type,
         to: JSON.stringify(message_to),
         topic: message_type === "stream" ? compose_state.topic() : "",
-        content: compose_state.message_content(),
+        content: get_message_with_reply(),
         scheduled_delivery_timestamp,
     };
 
     const draft_id = drafts.update_draft({
         no_notify: true,
-        update_count: false,
+        update_count: false, 
         is_sending_saving: true,
         force_save: true,
     });

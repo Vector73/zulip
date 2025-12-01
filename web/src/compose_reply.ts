@@ -2,6 +2,7 @@ import $ from "jquery";
 import assert from "minimalistic-assert";
 import type * as tippy from "tippy.js";
 import * as z from "zod/mini";
+import _ from "lodash";
 
 import * as channel from "./channel.ts";
 import * as compose_actions from "./compose_actions.ts";
@@ -23,12 +24,16 @@ import * as recent_view_ui from "./recent_view_ui.ts";
 import * as recent_view_util from "./recent_view_util.ts";
 import * as stream_data from "./stream_data.ts";
 import * as unread_ops from "./unread_ops.ts";
+import render_compose_reply from "../templates/compose_reply.hbs"
+import render_reply from "../templates/reply.hbs"
+import { wrap_mention_content_in_dom_element } from "./rendered_markdown.ts";
 
 export let respond_to_message = (opts: {
     keep_composebox_empty?: boolean;
     message_id?: number;
     reply_type?: "personal";
     trigger?: string;
+    reply_to_message?: boolean;
 }): void => {
     let message;
     let msg_type: "private" | "stream";
@@ -236,6 +241,7 @@ export function quote_message(opts: {
     reply_type?: "personal";
     trigger?: string;
     forward_message?: boolean;
+    reply_to_message?: boolean;
 }): void {
     const {message_id, message, quote_content} = get_quote_target(opts);
     const quoting_placeholder = $t({defaultMessage: "[Quoting…]"});
@@ -279,8 +285,8 @@ export function quote_message(opts: {
                 keep_composebox_empty: true,
             });
         }
-
-        compose_ui.insert_syntax_and_focus(quoting_placeholder, $textarea, "block");
+        if (!opts.reply_to_message)
+            compose_ui.insert_syntax_and_focus(quoting_placeholder, $textarea, "block");
     }
 
     function replace_content(message: Message, raw_content: string): void {
@@ -290,6 +296,10 @@ export function quote_message(opts: {
         //     message content
         //     ```
         // Keep syntax in sync with zerver/lib/reminders.py
+        if (opts.reply_to_message) {
+            insert_reply(message, raw_content);
+            return;
+        }
         let content = $t(
             {defaultMessage: "{username} [said]({link_to_message}):"},
             {
@@ -313,6 +323,41 @@ export function quote_message(opts: {
         if (select_recipient_widget !== undefined) {
             void select_recipient_widget._tippy?.popperInstance?.update();
         }
+    }
+
+    function insert_reply(message: Message, raw_content: string) {
+        let content = $t(
+            {defaultMessage: "{username} > [{content}]({link_to_message})"},
+            {
+                username: `@_**${message.sender_full_name}|${message.sender_id}**`,
+                link_to_message: hash_util.by_conversation_and_time_url(message),
+                content: raw_content.replaceAll("\n", " "),
+            },
+        );
+        const $content = $(`.message_row[data-message-id="${message.id}"`).find(".message_content").clone()
+        const $replyElement = $content.find(".reply")
+
+        const $parentBlock = $replyElement.parent()
+        $replyElement.remove()
+
+        if ($parentBlock.is(':empty')) {
+            $parentBlock.remove()
+        }
+        $content.find(".reply").closest("p")
+        console.log($content.clone().html())
+        $content.children().not(':first').remove();
+        content = $content.text().trim();
+        // compose_ui.insert_at_top(content + "\n", $textarea)
+        $("#message-content-container .reply").html(render_compose_reply({
+            include_reply_control_buttons: true,
+            reply_content: render_reply({
+                user_id: message.sender_id,
+                user: message.sender_full_name,
+                href: hash_util.by_conversation_and_time_url(message),
+                text: content,
+            })
+        }))
+        wrap_mention_content_in_dom_element($("#message-content-container .reply").find(".user-mention")[0]!, people.sender_is_bot(message))
     }
 
     if (message && quote_content) {

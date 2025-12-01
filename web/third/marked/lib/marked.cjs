@@ -544,6 +544,7 @@ inline.zulip = merge({}, inline.breaks, {
   emoji: /^:([A-Za-z0-9_\-\+]+?):/,
   unicodeemoji: possible_emoji_regex,
   usermention: /^@(_?)(?:\*\*([^\*]+)\*\*)/, // Match potentially multi-word string between @** **
+  reply: /^@(_?)(?:\*\*([^\*]+)\*\*)\s+>\s+!?\[(.+?)\]\((.+?)\)/,
   groupmention: /^@(_?)(?:\*([^\*]+)\*)/, // Match multi-word string between @* *
   stream_topic_message: /^#\*\*([^\*>]+)>([^\*]*)@(\d+)\*\*/,
   stream_topic: /^#\*\*([^\*>]+)>([^\*]*)\*\*/,
@@ -709,6 +710,15 @@ InlineLexer.prototype.output = function(src) {
           ? this.options.sanitizer(cap[0])
           : escape(cap[0])
         : cap[0]
+      continue;
+    }
+
+    if (cap = this.rules.reply.exec(src)) {
+      console.log(cap)
+      src = src.substring(cap[0].length);
+      console.log(src)
+      out += this.reply(unescape(cap[2]), cap[0], cap[1], unescape(cap[4]), cap[3]);
+      console.log(out)
       continue;
     }
 
@@ -912,6 +922,20 @@ InlineLexer.prototype.usermention = function (username, orig, silent) {
     return orig;
   }
   var handled = this.options.userMentionHandler(username, silent === '_');
+  if (handled !== undefined) {
+    return handled;
+  }
+
+  return orig;
+};
+
+InlineLexer.prototype.reply = function (username, orig, silent, href, text) {
+  orig = escape(orig);
+  if (typeof this.options.userMentionHandler !== 'function')
+  {
+    return orig;
+  }
+  var handled = this.options.replyHandler(username, silent === '_', href, text);
   if (handled !== undefined) {
     return handled;
   }

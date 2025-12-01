@@ -8,6 +8,7 @@ import code_buttons_container from "../templates/code_buttons_container.hbs";
 import render_markdown_audio from "../templates/markdown_audio.hbs";
 import render_markdown_timestamp from "../templates/markdown_timestamp.hbs";
 import render_mention_content_wrapper from "../templates/mention_content_wrapper.hbs";
+import render_compose_reply from "../templates/compose_reply.hbs";
 import render_topic_link from "../templates/topic_link.hbs";
 
 import * as blueslip from "./blueslip.ts";
@@ -86,7 +87,7 @@ function get_message_for_message_content($content: JQuery): Message | undefined 
 // This enables mentions to display inline, while adjusting
 // the outer element's font-size for better appearance on
 // lines of message text.
-function wrap_mention_content_in_dom_element(element: HTMLElement, is_bot = false): HTMLElement {
+export function wrap_mention_content_in_dom_element(element: HTMLElement, is_bot = false): HTMLElement {
     const mention_text = $(element).text();
     $(element).html(render_mention_content_wrapper({mention_text, is_bot}));
     return element;
@@ -120,7 +121,7 @@ export function set_name_in_mention_element(
     wrap_mention_content_in_dom_element(element, user_is_bot);
 }
 
-export const update_elements = ($content: JQuery): void => {
+export const update_elements = ($content: JQuery, include_reply_control_buttons = false): void => {
     // Set the rtl class if the text has an rtl direction
     if (rtl.get_direction($content.text()) === "rtl") {
         $content.addClass("rtl");
@@ -134,6 +135,10 @@ export const update_elements = ($content: JQuery): void => {
             this.load();
         });
     }
+
+    $content.find(".reply").first().html(
+        render_compose_reply({ reply_content: $content.find(".reply").html(), include_reply_control_buttons })
+    );
 
     // personal and stream wildcard mentions
     $content.find(".user-mention").each(function (): void {

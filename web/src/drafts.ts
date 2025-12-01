@@ -20,6 +20,7 @@ import * as sub_store from "./sub_store.ts";
 import * as timerender from "./timerender.ts";
 import * as ui_util from "./ui_util.ts";
 import * as util from "./util.ts";
+import { get_message_with_reply } from "./compose.ts";
 
 export let set_count = (count: number): void => {
     const $drafts_li = $(".top_left_drafts");
@@ -329,7 +330,7 @@ export function snapshot_message(force_save = false): LocalStorageDraft | undefi
     // Save what we can.
     const message = {
         type: compose_state.get_message_type(),
-        content: compose_state.message_content(),
+        content: get_message_with_reply(),
         updatedAt: getTimestamp(),
     };
     if (message.type === "private") {

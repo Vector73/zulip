@@ -1695,6 +1695,69 @@ class LinkifierPattern(CompiledInlineProcessor):
             m.end(2),
         )
 
+class ReplyPattern(CompiledInlineProcessor):
+    @override
+    def handleMatch(self, m, data):
+        name = m.group("match")
+        silent = m.group("silent") == "_"
+        url = m.group("href")
+        link_text = m.group("text")
+        db_data: DbData | None = self.zmd.zulip_db_data
+        if db_data is None:
+            return None, None, None
+        id_syntax_match = re.match(r"(?P<full_name>.+)?\|(?P<user_id>\d+)$", name)
+        if id_syntax_match:
+            full_name = id_syntax_match.group("full_name")
+            id = int(id_syntax_match.group("user_id"))
+            user = db_data.mention_data.get_user_by_id(id)
+
+            # For @**name|id**, we need to specifically check that
+            # name matches the full_name of user in mention_data.
+            # This enforces our decision that
+            # @**user_1_name|id_for_user_2** should be invalid syntax.
+            if user is None:
+                return None, None, None
+            if full_name and user.full_name != full_name:
+                return None, None, None
+        else:
+            # For @**name** syntax.
+            user = db_data.mention_data.get_user_by_name(name)
+
+        if user is not None:
+            assert isinstance(user, FullNameInfo)
+            if not user.is_active:
+                silent = True
+
+            if not silent:
+                self.zmd.zulip_rendering_result.mentions_user_ids.add(user.id)
+            name = user.full_name
+            user_id = str(user.id)
+        else:
+            # Don't highlight @mentions that don't refer to a valid user
+            return None, None, None
+            
+        user_id = str(user.id)
+        el = Element("span")
+        if user_id:
+            el.set("data-user-id", user_id)
+        text = f"@{name}"
+        el.set("class", "user-mention")
+        if silent:
+            el.set("class", el.get("class", "") + " silent")
+            text = f"{name}"
+        else:
+            self.zmd.zulip_rendering_result.mentions_user_ids.add(user.id)
+        el.text = markdown.util.AtomicString(text)
+        
+        anchor_element = url_to_a(db_data, url, self.unescape(link_text))
+        
+        wrapper = Element("span")
+        wrapper.set("class", "reply")
+        wrapper.insert(0, el)
+        wrapper.insert(1, anchor_element)
+
+        return wrapper, m.start(), m.end()
+
 
 class UserMentionPattern(CompiledInlineProcessor):
     @override
@@ -2260,6 +2323,11 @@ class ZulipMarkdown(markdown.Markdown):
         STRONG_EM_RE = r"(\*\*\*)(?!\s+)([^\*^\n]+)(?<!\s)\*\*\*"
         TEX_RE = r"\B(?<!\$)\$\$(?P<body>[^\n_$](\\\$|[^$\n])*)\$\$(?!\$)\B"
         TIMESTAMP_RE = r"<time:(?P<time>[^>]*?)>"
+        REPLY_RE = re.compile(
+    mention.MENTIONS_RE.pattern
+    + rf"\s+>\s+\[(?P<text>.+?)\]\((?P<href>[^)]+)\)\s*\n+",
+    re.DOTALL,
+)
 
         # Add inline patterns.  We use a custom numbering of the
         # rules, that preserves the order from upstream but leaves
@@ -2269,6 +2337,7 @@ class ZulipMarkdown(markdown.Markdown):
         reg.register(
             markdown.inlinepatterns.DoubleTagPattern(STRONG_EM_RE, "strong,em"), "strong_em", 100
         )
+        reg.register(ReplyPattern(REPLY_RE, self), "reply", 97)
         reg.register(UserMentionPattern(mention.MENTIONS_RE, self), "usermention", 95)
         reg.register(Tex(TEX_RE, self), "tex", 90)
         reg.register(
@@ -2754,6 +2823,14 @@ def render_message_markdown(
     sender = message.sender
     sent_by_bot = sender.is_bot
     translate_emoticons = sender.translate_emoticons
+    REPLY_RE = re.compile(
+    mention.MENTIONS_RE.pattern
+    + rf"\s+>\s+\[(?P<text>.+?)\]\((?P<href>[^)]+)\)\s*\n+",
+    re.DOTALL,
+)
+    print(repr(content))
+    if REPLY_RE.match(content):
+        print(repr(REPLY_RE.search(content).string))
 
     rendering_result = markdown_convert(
         content,

@@ -1,0 +1,8 @@
+<span class="reply-wrapper">
+    <i class="zulip-icon zulip-icon-reply reply-icon" aria-hidden="true"></i>
+    {{{reply_content}}}
+    {{#if include_reply_control_buttons}}
+    {{> components/icon_button custom_classes="mention-button reply-control-button" intent="neutral" icon="at-sign"}}
+    {{> components/icon_button custom_classes="remove-reply-button reply-control-button" intent="neutral" icon="close-small"}}
+    {{/if}}
+</span>

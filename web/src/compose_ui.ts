@@ -121,6 +121,18 @@ export function rewire_autosize_textarea(value: typeof autosize_textarea): void 
     autosize_textarea = value;
 }
 
+export let insert_at_top = (
+    content: string,
+    $textarea: JQuery<HTMLTextAreaElement>,
+): void => {
+    $textarea.val(content + "\n" + $textarea.val())
+    // Blurring and refocusing ensures the cursor / selection is in view
+    // in chromium browsers.
+    $textarea.trigger("blur");
+    $textarea.trigger("focus");
+    autosize_textarea($textarea);
+};
+
 export let insert_and_scroll_into_view = (
     content: string,
     $textarea: JQuery<HTMLTextAreaElement>,
@@ -1342,7 +1354,7 @@ export function render_and_show_preview(
         }
 
         $preview_content_box.html(postprocess_content(rendered_preview_html));
-        rendered_markdown.update_elements($preview_content_box);
+        rendered_markdown.update_elements($preview_content_box, true);
     }
 
     if (content.length === 0) {
